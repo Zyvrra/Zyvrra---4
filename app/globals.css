@@ -1,0 +1,81 @@
+:root {
+  --bg: #0b0b0b;
+  --text: #ffffff;
+  --muted: #9ca3af;
+
+  /* Zyvrra vibe palette (African urban / warm + clean) */
+  --accent-orange: #ff6a00;
+  --accent-sand: #f5c16c;
+  --accent-blue: #2d7dd2;
+  --accent-red: #ff3b3b;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* GLOBAL RESET */
+* {
+  box-sizing: border-box;
+}
+
+/* LINKS */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* SCROLL (TikTok-style vertical feed feel later) */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* BUTTON BASE STYLE */
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* ZYVRRA UTILITY CLASSES */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  background: #141414;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+/* TEXT STYLES */
+.text-muted {
+  color: var(--muted);
+}
+
+/* ANIMATIONS (for 🔥 yiyo + 👎 Neyva later) */
+@keyframes floatUp {
+  0% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-200px);
+    opacity: 0;
+  }
+}
+
+.float-up {
+  animation: floatUp 1.2s ease-out forwards;
+}
