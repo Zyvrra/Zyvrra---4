@@ -1,24 +1,36 @@
-import { kv } from "@vercel/kv";
-import { Order } from "./orders";
+export type Order = {
+  id: string;
+  buyerId: string;
+  productName: string;
+  amount: number;
+  createdAt: number;
+};
 
-const ORDERS_KEY = "zyvrra_orders";
+let orders: Order[] = [];
 
-export async function getOrders(): Promise<Order[]> {
-  const orders = await kv.get<Order[]>(ORDERS_KEY);
-  return orders || [];
+/**
+ * CREATE ORDER (checkout placeholder)
+ */
+export function createOrder(input: {
+  buyerId: string;
+  productName: string;
+  amount: number;
+}): Order {
+  const order: Order = {
+    id: `order_${Date.now()}`,
+    buyerId: input.buyerId,
+    productName: input.productName,
+    amount: input.amount,
+    createdAt: Date.now(),
+  };
+
+  orders.push(order);
+  return order;
 }
 
-export async function addOrder(order: Order) {
-  const orders = (await kv.get<Order[]>(ORDERS_KEY)) || [];
-  await kv.set(ORDERS_KEY, [order, ...orders]);
-}
-
-export async function updateOrder(updated: Order) {
-  const orders = (await kv.get<Order[]>(ORDERS_KEY)) || [];
-
-  const updatedList = orders.map((o) =>
-    o.id === updated.id ? updated : o
-  );
-
-  await kv.set(ORDERS_KEY, updatedList);
+/**
+ * GET ORDERS
+ */
+export function getOrders() {
+  return orders;
 }
