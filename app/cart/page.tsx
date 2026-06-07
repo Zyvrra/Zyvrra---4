@@ -1,81 +1,97 @@
 "use client";
 
 import { useState } from "react";
+import { initializePaystackPayment } from "@/lib/paystack";
+import { createOrder } from "@/lib/orders";
+import { getUserRole } from "@/lib/auth";
 
 type CartItem = {
   id: string;
-  name: string;
+  productName: string;
   price: number;
-  seller: string;
+  sellerId: string;
 };
 
 export default function CartPage() {
-  const [items] = useState<CartItem[]>([
+  const [cart] = useState<CartItem[]>([
     {
       id: "1",
-      name: "Urban Sneaker Drop",
+      productName: "Urban Sneaker Drop",
       price: 1200,
-      seller: "streetplug"
+      sellerId: "seller_1"
     }
   ]);
 
-  const DELIVERY_FEE = 75;
+  const deliveryFee = 75;
 
-  const subtotal = items.reduce((acc, item) => acc + item.price, 0);
-  const total = subtotal + DELIVERY_FEE;
+  const total =
+    cart.reduce((sum, item) => sum + item.price, 0) + deliveryFee;
 
-  const handleCheckout = () => {
-    alert("Redirecting to Paystack checkout (to be connected)");
+  const handleCheckout = async () => {
+    const role = getUserRole();
+
+    // 🚨 only buyers can checkout
+    if (!role || role !== "buyer") {
+      alert("Only buyers can checkout");
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+
+    const order = createOrder({
+      buyerId: role,
+      sellerId: cart[0].sellerId,
+      productName: cart[0].productName,
+      amount: cart[0].price,
+      deliveryFee
+    });
+
+    const payment = await initializePaystackPayment({
+      email: "buyer@email.com",
+      amount: total,
+      reference: order.id
+    });
+
+    if (payment?.authorization_url) {
+      window.location.href = payment.authorization_url;
+    } else {
+      alert("Payment failed to initialize");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
+    <div className="min-h-screen bg-black text-white p-6">
 
-      <h1 className="text-2xl font-bold mb-6">Your Bag</h1>
+      <h1 className="text-3xl font-bold">Cart</h1>
 
-      {/* ITEMS */}
-      <div className="space-y-4">
-        {items.map((item) => (
+      {/* CART ITEMS */}
+      <div className="mt-6 space-y-3">
+        {cart.map((item) => (
           <div key={item.id} className="bg-[#141414] p-4 rounded-xl">
-            <h2 className="font-bold">{item.name}</h2>
-            <p className="text-gray-400">@{item.seller}</p>
-            <p className="text-orange-400 font-bold">R{item.price}</p>
+            <p className="font-bold">{item.productName}</p>
+            <p className="text-orange-400">R{item.price}</p>
           </div>
         ))}
       </div>
 
       {/* SUMMARY */}
-      <div className="mt-8 bg-[#141414] p-4 rounded-xl space-y-2">
-        <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span>R{subtotal}</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Delivery</span>
-          <span>R{DELIVERY_FEE}</span>
-        </div>
-
-        <hr className="border-gray-700" />
-
-        <div className="flex justify-between font-bold text-lg">
-          <span>Total</span>
-          <span className="text-orange-400">R{total}</span>
-        </div>
+      <div className="mt-6 bg-[#141414] p-4 rounded-xl">
+        <p>Delivery Fee: R{deliveryFee}</p>
+        <p className="font-bold text-orange-400 mt-2">
+          Total: R{total}
+        </p>
       </div>
 
-      {/* CHECKOUT */}
+      {/* CHECKOUT BUTTON */}
       <button
         onClick={handleCheckout}
-        className="w-full mt-6 bg-white text-black py-3 rounded-xl font-bold"
+        className="mt-6 w-full bg-orange-500 text-black p-3 rounded-xl font-bold"
       >
-        Checkout with Paystack
+        Pay with Paystack
       </button>
-
-      {/* NOTE */}
-      <p className="text-xs text-gray-500 mt-4">
-        Secure payment via Paystack. Delivery fee fixed at R75.
-      </p>
 
     </div>
   );
