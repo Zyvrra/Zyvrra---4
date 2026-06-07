@@ -26,7 +26,7 @@ export type Contract = {
 let contracts: Contract[] = [];
 
 /**
- * SELLER CREATES CONTRACT
+ * CREATE CONTRACT (SELLER ONLY)
  */
 export function createContract(input: {
   creatorId: string;
@@ -41,6 +41,8 @@ export function createContract(input: {
 
   const zyvrraFee = 2;
 
+  const creatorShare = Math.max(1, Math.min(98, input.creatorShare));
+
   const contract: Contract = {
     id: `contract_${Date.now()}`,
 
@@ -49,8 +51,8 @@ export function createContract(input: {
 
     productName: input.productName,
 
-    creatorShare: input.creatorShare,
-    sellerShare: 100 - input.creatorShare - zyvrraFee,
+    creatorShare,
+    sellerShare: 100 - creatorShare - zyvrraFee,
     zyvrraFee,
 
     status: "Pending",
@@ -63,7 +65,7 @@ export function createContract(input: {
 }
 
 /**
- * CREATOR INBOX
+ * CREATOR CONTRACTS
  */
 export function getCreatorContracts() {
   const user = getCurrentUser();
@@ -75,7 +77,7 @@ export function getCreatorContracts() {
 }
 
 /**
- * SELLER DASHBOARD
+ * SELLER CONTRACTS
  */
 export function getSellerContracts() {
   const user = getCurrentUser();
@@ -87,7 +89,7 @@ export function getSellerContracts() {
 }
 
 /**
- * ACCEPT CONTRACT
+ * ACCEPT
  */
 export function acceptContract(contractId: string) {
   contracts = contracts.map((c) =>
@@ -98,7 +100,7 @@ export function acceptContract(contractId: string) {
 }
 
 /**
- * REJECT CONTRACT
+ * REJECT
  */
 export function rejectContract(contractId: string) {
   contracts = contracts.map((c) =>
