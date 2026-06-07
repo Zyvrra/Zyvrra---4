@@ -11,9 +11,9 @@ let currentUser: User | null = null;
 /**
  * LOGIN USER (MVP)
  */
-export function login(email: string, role: UserRole) {
+export function login(email: string, role: UserRole): User {
   const user: User = {
-    id: `user_${Date.now()}`,
+    id: `user_${email.replace(/[^a-zA-Z0-9]/g, "")}`,
     email,
     role,
   };
@@ -35,10 +35,9 @@ export function getCurrentUser(): User | null {
 
   const stored = localStorage.getItem("zyvrra_user");
 
-  if (stored) {
-    currentUser = JSON.parse(stored);
-  }
+  if (!stored) return null;
 
+  currentUser = JSON.parse(stored);
   return currentUser;
 }
 
