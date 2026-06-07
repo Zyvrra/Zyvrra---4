@@ -22,7 +22,7 @@ export default function FeedPage() {
   return (
     <div className="bg-black min-h-screen text-white">
 
-      {/* TOP BAR */}
+      {/* HEADER */}
       <div className="sticky top-0 z-50 bg-black border-b border-gray-800 px-4 py-3 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-orange-400">
           Zyvrra
@@ -36,7 +36,7 @@ export default function FeedPage() {
         </button>
       </div>
 
-      {/* LOADING */}
+      {/* LOADING STATE */}
       {loading && (
         <div className="p-6 text-gray-400">
           Loading feed...
@@ -51,7 +51,7 @@ export default function FeedPage() {
             className="relative h-screen border-b border-gray-900"
           >
 
-            {/* VIDEO */}
+            {/* VIDEO AREA */}
             <div className="absolute inset-0 bg-black flex items-center justify-center">
               {post.videoUrl ? (
                 <video
@@ -68,7 +68,7 @@ export default function FeedPage() {
               )}
             </div>
 
-            {/* OVERLAY */}
+            {/* DARK OVERLAY */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
             {/* LEFT INFO */}
@@ -97,7 +97,7 @@ export default function FeedPage() {
               <button className="text-sm">💾 Save</button>
               <button className="text-sm">🔗 Share</button>
 
-              {/* 🛍 BAG → CART */}
+              {/* 🛍 BAG BUTTON (FULL FIXED VERSION) */}
               <button
                 onClick={() =>
                   addToCart({
@@ -108,6 +108,10 @@ export default function FeedPage() {
                     caption: post.caption,
                     videoUrl: post.videoUrl,
                     createdAt: post.createdAt,
+
+                    // 🔥 AFFILIATE SUPPORT (TEMP DEFAULTS)
+                    creatorId: "creator_demo",
+                    affiliateLinkCode: "link_demo",
                   })
                 }
                 className="bg-orange-500 text-black px-3 py-2 rounded-full text-sm font-bold"
