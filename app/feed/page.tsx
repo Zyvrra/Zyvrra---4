@@ -6,9 +6,12 @@ import { getPosts, Post } from "@/lib/postsStore";
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setPosts(getPosts());
+    const data = getPosts();
+    setPosts(data);
+    setLoading(false);
   }, []);
 
   return (
@@ -28,6 +31,13 @@ export default function FeedPage() {
         </button>
       </div>
 
+      {/* LOADING STATE (IMPORTANT FOR DEPLOY) */}
+      {loading && (
+        <div className="p-6 text-gray-400">
+          Loading feed...
+        </div>
+      )}
+
       {/* FEED */}
       <div>
         {posts.map((post) => (
@@ -36,16 +46,16 @@ export default function FeedPage() {
             className="relative h-screen border-b border-gray-900"
           >
 
-            {/* VIDEO */}
+            {/* VIDEO SAFE RENDER */}
             <div className="absolute inset-0 bg-black flex items-center justify-center">
               {post.videoUrl ? (
                 <video
                   src={post.videoUrl}
                   className="w-full h-full object-cover"
-                  controls
                   loop
                   muted
                   playsInline
+                  controls={false}
                 />
               ) : (
                 <div className="text-gray-500 text-lg">
@@ -54,7 +64,7 @@ export default function FeedPage() {
               )}
             </div>
 
-            {/* DARK OVERLAY */}
+            {/* OVERLAY */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
             {/* LEFT INFO */}
