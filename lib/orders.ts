@@ -7,30 +7,39 @@ export type OrderStatus =
 
 export type Order = {
   id: string;
+
   buyerId: string;
   sellerId: string;
+
+  // 🔥 AFFILIATE TRACKING (NEW CORE ENGINE)
   creatorId?: string;
+  affiliateLinkCode?: string;
 
   productName: string;
-  amount: number;
 
+  amount: number;
   deliveryFee: number;
   totalAmount: number;
 
   status: OrderStatus;
 
   createdAt: number;
+
   deliveredAt?: number;
-  payoutEligibleAt?: number; // deliveredAt + 3 days
+  payoutEligibleAt?: number; // deliveredAt + 3 days (your rule)
 };
 
 /**
  * Create a new order when buyer checks out
+ * NOW WITH AFFILIATE SUPPORT
  */
 export function createOrder(input: {
   buyerId: string;
   sellerId: string;
+
   creatorId?: string;
+  affiliateLinkCode?: string;
+
   productName: string;
   amount: number;
   deliveryFee: number;
@@ -39,18 +48,22 @@ export function createOrder(input: {
 
   return {
     id: `order_${Date.now()}`,
+
     buyerId: input.buyerId,
     sellerId: input.sellerId,
+
     creatorId: input.creatorId,
+    affiliateLinkCode: input.affiliateLinkCode,
 
     productName: input.productName,
+
     amount: input.amount,
     deliveryFee: input.deliveryFee,
     totalAmount,
 
     status: "Pending",
 
-    createdAt: Date.now()
+    createdAt: Date.now(),
   };
 }
 
@@ -60,12 +73,13 @@ export function createOrder(input: {
 export function markAsDispatched(order: Order): Order {
   return {
     ...order,
-    status: "Dispatched"
+    status: "Dispatched",
   };
 }
 
 /**
  * Delivery confirmation triggers payout timer
+ * (YOUR 3-DAY POST-DELIVERY HOLD SYSTEM)
  */
 export function markAsDelivered(order: Order): Order {
   const deliveredAt = Date.now();
@@ -74,12 +88,13 @@ export function markAsDelivered(order: Order): Order {
     ...order,
     status: "Delivered",
     deliveredAt,
-    payoutEligibleAt: deliveredAt + 3 * 24 * 60 * 60 * 1000 // 3 days
+    payoutEligibleAt:
+      deliveredAt + 3 * 24 * 60 * 60 * 1000, // 72 hours
   };
 }
 
 /**
- * Check if seller/creator can be paid
+ * Check if payout is ready
  */
 export function isPayoutReady(order: Order): boolean {
   if (!order.payoutEligibleAt) return false;
@@ -88,11 +103,11 @@ export function isPayoutReady(order: Order): boolean {
 }
 
 /**
- * Complete order after payout window passes
+ * Final completion after payout window
  */
 export function completeOrder(order: Order): Order {
   return {
     ...order,
-    status: "Completed"
+    status: "Completed",
   };
 }
