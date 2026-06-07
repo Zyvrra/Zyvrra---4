@@ -36,6 +36,7 @@ export default function CartPage() {
     }
 
     const order = createOrder({
+    addOrder(order);  
       buyerId: role, // anyone can checkout now
       sellerId: cart[0].sellerId,
       productName: cart[0].productName,
