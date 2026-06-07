@@ -1,72 +1,45 @@
-"use client";
+import Link from "next/link";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-export default function HomePage() {
-  const router = useRouter();
-  const [role, setRole] = useState<string>("");
-
-  const handleContinue = () => {
-    if (!role) return;
-
-    localStorage.setItem("zyvrra_role", role);
-
-    if (role === "buyer") router.push("/feed");
-    if (role === "seller") router.push("/seller-hub");
-    if (role === "creator") router.push("/creator-hub");
-  };
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col justify-center items-center p-6">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6">
 
-      <h1 className="text-4xl font-bold text-orange-400">
+      {/* BRAND */}
+      <h1 className="text-5xl font-bold text-orange-400">
         Zyvrra
       </h1>
 
-      <p className="text-gray-400 mt-2 text-center">
-        African Social Commerce for Fashion, Creators & Sellers
+      <p className="text-gray-400 mt-3 text-center max-w-md">
+        A creator-powered marketplace where content meets commerce.
       </p>
 
-      {/* ROLE SELECT */}
-      <div className="mt-10 w-full max-w-sm space-y-3">
+      {/* CTA BUTTON */}
+      <Link
+        href="/feed"
+        className="mt-8 bg-orange-500 text-black px-6 py-3 rounded-xl font-bold text-lg"
+      >
+        Enter Marketplace
+      </Link>
 
-        <button
-          onClick={() => setRole("buyer")}
-          className={`w-full p-3 rounded-xl ${
-            role === "buyer" ? "bg-white text-black" : "bg-[#141414]"
-          }`}
-        >
-          I am a Buyer
-        </button>
+      {/* SECONDARY OPTIONS */}
+      <div className="mt-6 flex gap-4 text-sm text-gray-400">
+        <Link href="/login" className="hover:text-white">
+          Login
+        </Link>
 
-        <button
-          onClick={() => setRole("seller")}
-          className={`w-full p-3 rounded-xl ${
-            role === "seller" ? "bg-white text-black" : "bg-[#141414]"
-          }`}
-        >
-          I am a Seller
-        </button>
+        <Link href="/seller-hub" className="hover:text-white">
+          Seller Hub
+        </Link>
 
-        <button
-          onClick={() => setRole("creator")}
-          className={`w-full p-3 rounded-xl ${
-            role === "creator" ? "bg-white text-black" : "bg-[#141414]"
-          }`}
-        >
-          I am a Creator
-        </button>
-
+        <Link href="/creator-hub" className="hover:text-white">
+          Creator Hub
+        </Link>
       </div>
 
-      {/* CONTINUE */}
-      <button
-        onClick={handleContinue}
-        className="mt-8 bg-orange-500 text-black px-6 py-3 rounded-xl font-bold"
-      >
-        Continue
-      </button>
+      {/* FOOTER NOTE */}
+      <p className="text-xs text-gray-600 mt-10 text-center">
+        Built for creators, sellers, and digital commerce.
+      </p>
 
     </div>
   );
