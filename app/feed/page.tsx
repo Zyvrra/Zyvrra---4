@@ -1,33 +1,16 @@
+        
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactionBar from "@/components/ReactionBar";
-
-type Post = {
-  id: string;
-  username: string;
-  productName: string;
-  price: number;
-  caption: string;
-};
+import { getPosts, Post } from "@/lib/postsStore";
 
 export default function FeedPage() {
-  const [posts] = useState<Post[]>([
-    {
-      id: "1",
-      username: "streetplug",
-      productName: "Urban Sneaker Drop",
-      price: 1200,
-      caption: "Fresh local heat. #streetwear #zyvrra"
-    },
-    {
-      id: "2",
-      username: "zuluwear",
-      productName: "African Street Hoodie",
-      price: 850,
-      caption: "Built for the culture. #fashion #africanurban"
-    }
-  ]);
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    setPosts(getPosts());
+  }, []);
 
   return (
     <div className="bg-black min-h-screen text-white">
@@ -38,7 +21,10 @@ export default function FeedPage() {
           Zyvrra
         </h1>
 
-        <button className="bg-white text-black px-3 py-2 rounded-full text-sm font-semibold">
+        <button
+          onClick={() => window.location.href = "/upload"}
+          className="bg-white text-black px-3 py-2 rounded-full text-sm font-semibold"
+        >
           📷 Upload
         </button>
       </div>
@@ -50,23 +36,24 @@ export default function FeedPage() {
             key={post.id}
             className="relative h-screen border-b border-gray-900"
           >
+
             {/* VIDEO AREA */}
             <div className="absolute inset-0 bg-[#111] flex items-center justify-center">
               <span className="text-gray-500 text-lg">
-                🎥 Product Video
+                🎥 Video Placeholder (30s max later)
               </span>
             </div>
 
-            {/* OVERLAY */}
+            {/* DARK OVERLAY */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-            {/* PRODUCT DETAILS */}
+            {/* LEFT INFO */}
             <div className="absolute bottom-24 left-4 max-w-[70%]">
               <p className="font-bold text-lg">
                 @{post.username}
               </p>
 
-              <p className="mt-2 text-sm">
+              <p className="mt-2 text-sm text-gray-300">
                 {post.caption}
               </p>
 
@@ -79,31 +66,23 @@ export default function FeedPage() {
               </p>
             </div>
 
-            {/* RIGHT SIDE ACTIONS */}
+            {/* RIGHT ACTIONS */}
             <div className="absolute right-4 bottom-24 flex flex-col gap-4 items-center">
 
-              <button className="text-sm">
-                ❤️ Love
-              </button>
-
-              <button className="text-sm">
-                💾 Save
-              </button>
-
-              <button className="text-sm">
-                🔗 Share
-              </button>
+              <button className="text-sm">❤️ Love</button>
+              <button className="text-sm">💾 Save</button>
+              <button className="text-sm">🔗 Share</button>
 
               <button className="bg-orange-500 text-black px-3 py-2 rounded-full text-sm font-bold">
                 🛍 Bag
               </button>
-
             </div>
 
             {/* REACTIONS */}
             <div className="absolute bottom-4 left-4 right-4">
               <ReactionBar postId={post.id} />
             </div>
+
           </div>
         ))}
       </div>
