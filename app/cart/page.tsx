@@ -4,7 +4,7 @@ import { useState } from "react";
 import { initializePaystackPayment } from "@/lib/paystack";
 import { createOrder } from "@/lib/orders";
 import { getUserRole } from "@/lib/auth";
-
+import { addOrder } from "@/lib/orderStore";
 type CartItem = {
   id: string;
   productName: string;
