@@ -9,9 +9,13 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = getPosts();
-    setPosts(data);
-    setLoading(false);
+    async function load() {
+      const data = await getPosts();
+      setPosts(data);
+      setLoading(false);
+    }
+
+    load();
   }, []);
 
   return (
@@ -31,7 +35,7 @@ export default function FeedPage() {
         </button>
       </div>
 
-      {/* LOADING STATE (IMPORTANT FOR DEPLOY) */}
+      {/* LOADING STATE */}
       {loading && (
         <div className="p-6 text-gray-400">
           Loading feed...
@@ -46,7 +50,7 @@ export default function FeedPage() {
             className="relative h-screen border-b border-gray-900"
           >
 
-            {/* VIDEO SAFE RENDER */}
+            {/* VIDEO */}
             <div className="absolute inset-0 bg-black flex items-center justify-center">
               {post.videoUrl ? (
                 <video
@@ -55,7 +59,6 @@ export default function FeedPage() {
                   loop
                   muted
                   playsInline
-                  controls={false}
                 />
               ) : (
                 <div className="text-gray-500 text-lg">
@@ -67,11 +70,9 @@ export default function FeedPage() {
             {/* OVERLAY */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-            {/* LEFT INFO */}
+            {/* INFO */}
             <div className="absolute bottom-24 left-4 max-w-[70%]">
-              <p className="font-bold text-lg">
-                @{post.username}
-              </p>
+              <p className="font-bold text-lg">@{post.username}</p>
 
               <p className="mt-2 text-sm text-gray-300">
                 {post.caption}
@@ -86,17 +87,14 @@ export default function FeedPage() {
               </p>
             </div>
 
-            {/* RIGHT ACTIONS */}
+            {/* ACTIONS */}
             <div className="absolute right-4 bottom-24 flex flex-col gap-4 items-center">
-
-              <button className="text-sm">❤️ Love</button>
-              <button className="text-sm">💾 Save</button>
-              <button className="text-sm">🔗 Share</button>
-
+              <button>❤️ Love</button>
+              <button>💾 Save</button>
+              <button>🔗 Share</button>
               <button className="bg-orange-500 text-black px-3 py-2 rounded-full text-sm font-bold">
                 🛍 Bag
               </button>
-
             </div>
 
             {/* REACTIONS */}
