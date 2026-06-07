@@ -1,12 +1,17 @@
 import { Post } from "./postsStore";
 
-let cart: Post[] = [];
+export type CartItem = Post & {
+  creatorId?: string;
+  affiliateLinkCode?: string;
+};
 
-export function addToCart(post: Post) {
-  cart.push(post);
+let cart: CartItem[] = [];
+
+export function addToCart(item: CartItem) {
+  cart.push(item);
 }
 
-export function getCart() {
+export function getCart(): CartItem[] {
   return cart;
 }
 
