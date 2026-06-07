@@ -1,38 +1,29 @@
+import { kv } from "@vercel/kv";
+
 export type Post = {
   id: string;
   username: string;
   productName: string;
   price: number;
   caption: string;
-  videoUrl: string; // IMPORTANT: real video file URL (MVP = local blob)
+  videoUrl: string;
   createdAt: number;
 };
 
-let posts: Post[] = [
-  {
-    id: "1",
-    username: "streetplug",
-    productName: "Urban Sneaker Drop",
-    price: 1200,
-    caption: "Fresh local heat 🔥",
-    videoUrl: "",
-    createdAt: Date.now(),
-  },
-  {
-    id: "2",
-    username: "zuluwear",
-    productName: "African Street Hoodie",
-    price: 850,
-    caption: "Built for the culture 🖤",
-    videoUrl: "",
-    createdAt: Date.now(),
-  },
-];
+const POSTS_KEY = "zyvrra_posts";
 
-export function getPosts(): Post[] {
-  return posts;
+/**
+ * Get all posts (safe for Vercel)
+ */
+export async function getPosts(): Promise<Post[]> {
+  const posts = await kv.get<Post[]>(POSTS_KEY);
+  return posts || [];
 }
 
-export function addPost(post: Post) {
-  posts = [post, ...posts];
+/**
+ * Add new post
+ */
+export async function addPost(post: Post) {
+  const posts = (await kv.get<Post[]>(POSTS_KEY)) || [];
+  await kv.set(POSTS_KEY, [post, ...posts]);
 }
