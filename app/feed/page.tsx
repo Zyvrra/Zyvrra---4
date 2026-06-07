@@ -1,4 +1,3 @@
-        
 "use client";
 
 import { useEffect, useState } from "react";
@@ -22,7 +21,7 @@ export default function FeedPage() {
         </h1>
 
         <button
-          onClick={() => window.location.href = "/upload"}
+          onClick={() => (window.location.href = "/upload")}
           className="bg-white text-black px-3 py-2 rounded-full text-sm font-semibold"
         >
           📷 Upload
@@ -37,11 +36,22 @@ export default function FeedPage() {
             className="relative h-screen border-b border-gray-900"
           >
 
-            {/* VIDEO AREA */}
-            <div className="absolute inset-0 bg-[#111] flex items-center justify-center">
-              <span className="text-gray-500 text-lg">
-                🎥 Video Placeholder (30s max later)
-              </span>
+            {/* VIDEO */}
+            <div className="absolute inset-0 bg-black flex items-center justify-center">
+              {post.videoUrl ? (
+                <video
+                  src={post.videoUrl}
+                  className="w-full h-full object-cover"
+                  controls
+                  loop
+                  muted
+                  playsInline
+                />
+              ) : (
+                <div className="text-gray-500 text-lg">
+                  🎥 No video uploaded
+                </div>
+              )}
             </div>
 
             {/* DARK OVERLAY */}
@@ -76,6 +86,7 @@ export default function FeedPage() {
               <button className="bg-orange-500 text-black px-3 py-2 rounded-full text-sm font-bold">
                 🛍 Bag
               </button>
+
             </div>
 
             {/* REACTIONS */}
