@@ -1,36 +1,109 @@
-export type Order = {
+import { getCurrentUser } from "./userStore";
+
+export type ContractStatus =
+  | "Pending"
+  | "Active"
+  | "Rejected"
+  | "Ended";
+
+export type Contract = {
   id: string;
-  buyerId: string;
+
+  sellerId: string;
+  creatorId: string;
+
   productName: string;
-  amount: number;
+
+  creatorShare: number;
+  sellerShare: number;
+  zyvrraFee: number;
+
+  status: ContractStatus;
+
   createdAt: number;
 };
 
-let orders: Order[] = [];
+let contracts: Contract[] = [];
 
 /**
- * CREATE ORDER (checkout placeholder)
+ * SELLER CREATES CONTRACT
  */
-export function createOrder(input: {
-  buyerId: string;
+export function createContract(input: {
+  creatorId: string;
   productName: string;
-  amount: number;
-}): Order {
-  const order: Order = {
-    id: `order_${Date.now()}`,
-    buyerId: input.buyerId,
+  creatorShare: number;
+}): Contract {
+  const user = getCurrentUser();
+
+  if (!user || user.role !== "seller") {
+    throw new Error("Only sellers can create contracts");
+  }
+
+  const zyvrraFee = 2;
+
+  const contract: Contract = {
+    id: `contract_${Date.now()}`,
+
+    sellerId: user.id,
+    creatorId: input.creatorId,
+
     productName: input.productName,
-    amount: input.amount,
+
+    creatorShare: input.creatorShare,
+    sellerShare: 100 - input.creatorShare - zyvrraFee,
+    zyvrraFee,
+
+    status: "Pending",
+
     createdAt: Date.now(),
   };
 
-  orders.push(order);
-  return order;
+  contracts.push(contract);
+  return contract;
 }
 
 /**
- * GET ORDERS
+ * CREATOR INBOX
  */
-export function getOrders() {
-  return orders;
+export function getCreatorContracts() {
+  const user = getCurrentUser();
+  if (!user) return [];
+
+  return contracts.filter(
+    (c) => c.creatorId === user.id
+  );
+}
+
+/**
+ * SELLER DASHBOARD
+ */
+export function getSellerContracts() {
+  const user = getCurrentUser();
+  if (!user) return [];
+
+  return contracts.filter(
+    (c) => c.sellerId === user.id
+  );
+}
+
+/**
+ * ACCEPT CONTRACT
+ */
+export function acceptContract(contractId: string) {
+  contracts = contracts.map((c) =>
+    c.id === contractId
+      ? { ...c, status: "Active" }
+      : c
+  );
+}
+
+/**
+ * REJECT CONTRACT
+ */
+export function rejectContract(contractId: string) {
+  contracts = contracts.map((c) =>
+    c.id === contractId
+      ? { ...c, status: "Rejected" }
+      : c
+  );
 }
