@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ReactionBar from "@/components/ReactionBar";
 import { getPosts, Post } from "@/lib/postsStore";
+import { addToCart } from "@/lib/cartStore";
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -35,7 +36,7 @@ export default function FeedPage() {
         </button>
       </div>
 
-      {/* LOADING STATE */}
+      {/* LOADING */}
       {loading && (
         <div className="p-6 text-gray-400">
           Loading feed...
@@ -70,9 +71,11 @@ export default function FeedPage() {
             {/* OVERLAY */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-            {/* INFO */}
+            {/* LEFT INFO */}
             <div className="absolute bottom-24 left-4 max-w-[70%]">
-              <p className="font-bold text-lg">@{post.username}</p>
+              <p className="font-bold text-lg">
+                @{post.username}
+              </p>
 
               <p className="mt-2 text-sm text-gray-300">
                 {post.caption}
@@ -87,14 +90,31 @@ export default function FeedPage() {
               </p>
             </div>
 
-            {/* ACTIONS */}
+            {/* RIGHT ACTIONS */}
             <div className="absolute right-4 bottom-24 flex flex-col gap-4 items-center">
-              <button>❤️ Love</button>
-              <button>💾 Save</button>
-              <button>🔗 Share</button>
-              <button className="bg-orange-500 text-black px-3 py-2 rounded-full text-sm font-bold">
+
+              <button className="text-sm">❤️ Love</button>
+              <button className="text-sm">💾 Save</button>
+              <button className="text-sm">🔗 Share</button>
+
+              {/* 🛍 BAG → CART */}
+              <button
+                onClick={() =>
+                  addToCart({
+                    id: post.id,
+                    username: post.username,
+                    productName: post.productName,
+                    price: post.price,
+                    caption: post.caption,
+                    videoUrl: post.videoUrl,
+                    createdAt: post.createdAt,
+                  })
+                }
+                className="bg-orange-500 text-black px-3 py-2 rounded-full text-sm font-bold"
+              >
                 🛍 Bag
               </button>
+
             </div>
 
             {/* REACTIONS */}
