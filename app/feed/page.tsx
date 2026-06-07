@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-
+import ReactionBar from "@/components/ReactionBar";
 type Post = {
   id: string;
   username: string;
