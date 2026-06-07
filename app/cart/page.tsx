@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { getCart, clearCart } from "@/lib/cartStore";
+import { createOrder } from "@/lib/orderStore";
+
+type CartItem = {
+  productName: string;
+  price: number;
+  username?: string;
+};
 
 export default function CartPage() {
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -19,6 +26,11 @@ export default function CartPage() {
     try {
       setLoading(true);
 
+      if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
+
       const res = await fetch("/api/paystack/initialize", {
         method: "POST",
         headers: {
@@ -32,17 +44,26 @@ export default function CartPage() {
 
       const data = await res.json();
 
-      if (data?.data?.authorization_url) {
-        // clear cart BEFORE redirect (safe MVP approach)
-        clearCart();
-
-        window.location.href = data.data.authorization_url;
-      } else {
+      if (!data?.data?.authorization_url) {
         alert("Payment initialization failed");
+        return;
       }
+
+      // 🧠 CREATE ORDER BEFORE REDIRECT
+      createOrder({
+        buyerId: "buyer_demo",
+        productName: "Cart Purchase",
+        amount: totalAmount,
+      });
+
+      // clear cart AFTER order creation
+      clearCart();
+
+      // redirect to Paystack
+      window.location.href = data.data.authorization_url;
     } catch (error) {
       console.error(error);
-      alert("Something went wrong during checkout");
+      alert("Checkout failed");
     } finally {
       setLoading(false);
     }
@@ -51,19 +72,16 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-black text-white p-6">
 
-      {/* HEADER */}
       <h1 className="text-2xl font-bold text-orange-400">
         Your Cart
       </h1>
 
-      {/* EMPTY STATE */}
       {cart.length === 0 ? (
         <p className="text-gray-400 mt-4">
           Your cart is empty
         </p>
       ) : (
         <>
-          {/* ITEMS */}
           <div className="mt-6 space-y-4">
             {cart.map((item, i) => (
               <div
@@ -75,7 +93,7 @@ export default function CartPage() {
                 </p>
 
                 <p className="text-gray-400 text-sm">
-                  @{item.username}
+                  @{item.username || "unknown"}
                 </p>
 
                 <p className="text-orange-400 font-bold">
@@ -85,7 +103,6 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* SUMMARY */}
           <div className="mt-6 bg-[#141414] p-4 rounded-xl">
             <p>Subtotal: R{subtotal}</p>
             <p>Delivery: R{deliveryFee}</p>
@@ -94,7 +111,6 @@ export default function CartPage() {
             </p>
           </div>
 
-          {/* CHECKOUT BUTTON */}
           <button
             onClick={handleCheckout}
             disabled={loading}
