@@ -1,17 +1,24 @@
+import { kv } from "@vercel/kv";
 import { Order } from "./orders";
 
-let orders: Order[] = [];
+const ORDERS_KEY = "zyvrra_orders";
 
-export function addOrder(order: Order) {
-  orders.push(order);
+export async function getOrders(): Promise<Order[]> {
+  const orders = await kv.get<Order[]>(ORDERS_KEY);
+  return orders || [];
 }
 
-export function getOrders() {
-  return orders;
+export async function addOrder(order: Order) {
+  const orders = (await kv.get<Order[]>(ORDERS_KEY)) || [];
+  await kv.set(ORDERS_KEY, [order, ...orders]);
 }
 
-export function updateOrder(updated: Order) {
-  orders = orders.map((o) =>
+export async function updateOrder(updated: Order) {
+  const orders = (await kv.get<Order[]>(ORDERS_KEY)) || [];
+
+  const newOrders = orders.map((o) =>
     o.id === updated.id ? updated : o
   );
+
+  await kv.set(ORDERS_KEY, newOrders);
 }
