@@ -12,8 +12,9 @@ export type Contract = {
 
   productName: string;
 
+  // 💰 SPLIT RULES
   creatorShare: number; // e.g. 10%
-  sellerShare: number;  // remaining
+  sellerShare: number;  // auto-calculated
   zyvrraFee: number;    // always 2%
 
   status: ContractStatus;
@@ -21,10 +22,15 @@ export type Contract = {
   createdAt: number;
 };
 
+/**
+ * In-memory contract storage (MVP)
+ * Later replaced with database (Supabase/Firebase/Postgres)
+ */
 let contracts: Contract[] = [];
 
 /**
- * Create contract (Seller action)
+ * CREATE CONTRACT (Seller action)
+ * This is what powers your marketplace agreements
  */
 export function createContract(input: {
   sellerId: string;
@@ -32,6 +38,8 @@ export function createContract(input: {
   productName: string;
   creatorShare: number;
 }): Contract {
+  const zyvrraFee = 2;
+
   const contract: Contract = {
     id: `contract_${Date.now()}`,
 
@@ -41,8 +49,8 @@ export function createContract(input: {
     productName: input.productName,
 
     creatorShare: input.creatorShare,
-    sellerShare: 100 - input.creatorShare - 2, // Zyvrra always 2%
-    zyvrraFee: 2,
+    sellerShare: 100 - input.creatorShare - zyvrraFee,
+    zyvrraFee,
 
     status: "Pending",
 
@@ -50,11 +58,12 @@ export function createContract(input: {
   };
 
   contracts.push(contract);
+
   return contract;
 }
 
 /**
- * Get contracts for creator inbox
+ * GET CONTRACTS FOR CREATOR (Inbox)
  */
 export function getCreatorContracts(creatorId: string) {
   return contracts.filter(
@@ -63,7 +72,7 @@ export function getCreatorContracts(creatorId: string) {
 }
 
 /**
- * Get contracts for seller dashboard
+ * GET CONTRACTS FOR SELLER (Dashboard)
  */
 export function getSellerContracts(sellerId: string) {
   return contracts.filter(
@@ -72,7 +81,7 @@ export function getSellerContracts(sellerId: string) {
 }
 
 /**
- * Accept contract (Creator action)
+ * ACCEPT CONTRACT (Creator action)
  */
 export function acceptContract(contractId: string) {
   contracts = contracts.map((c) =>
@@ -83,7 +92,7 @@ export function acceptContract(contractId: string) {
 }
 
 /**
- * Reject contract (Creator action)
+ * REJECT CONTRACT (Creator action)
  */
 export function rejectContract(contractId: string) {
   contracts = contracts.map((c) =>
@@ -91,4 +100,22 @@ export function rejectContract(contractId: string) {
       ? { ...c, status: "Rejected" }
       : c
   );
+}
+
+/**
+ * END CONTRACT (optional future use)
+ */
+export function endContract(contractId: string) {
+  contracts = contracts.map((c) =>
+    c.id === contractId
+      ? { ...c, status: "Ended" }
+      : c
+  );
+}
+
+/**
+ * GET SINGLE CONTRACT (useful for contract page later)
+ */
+export function getContractById(contractId: string) {
+  return contracts.find((c) => c.id === contractId);
 }
