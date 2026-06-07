@@ -20,7 +20,12 @@ export default function CartPage() {
     for (const item of cart) {
       const order = createOrder({
         buyerId: "buyer_demo",
-        sellerId: "seller_demo",
+        sellerId: item.username, // seller = post owner
+
+        // 🔥 AFFILIATE TRACKING PASSED THROUGH
+        creatorId: item.creatorId,
+        affiliateLinkCode: item.affiliateLinkCode,
+
         productName: item.productName,
         amount: item.price,
         deliveryFee: 75,
@@ -37,7 +42,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-black text-white p-6">
 
       <h1 className="text-2xl font-bold text-orange-400">
-        Your Cart
+        Cart
       </h1>
 
       {cart.length === 0 ? (
@@ -46,27 +51,24 @@ export default function CartPage() {
         <>
           <div className="mt-6 space-y-4">
             {cart.map((item, i) => (
-              <div
-                key={i}
-                className="bg-[#141414] p-4 rounded-xl"
-              >
+              <div key={i} className="bg-[#141414] p-4 rounded-xl">
                 <p className="font-bold">{item.productName}</p>
-                <p className="text-orange-400">
-                  R{item.price}
-                </p>
+                <p className="text-orange-400">R{item.price}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-6 bg-[#141414] p-4 rounded-xl">
-            <p>Total: R{total + cart.length * 75}</p>
+            <p className="text-white">
+              Total: R{total + cart.length * 75}
+            </p>
           </div>
 
           <button
             onClick={handleCheckout}
             className="mt-6 bg-orange-500 text-black px-4 py-3 rounded-xl font-bold w-full"
           >
-            Checkout (Paystack later)
+            Checkout
           </button>
         </>
       )}
