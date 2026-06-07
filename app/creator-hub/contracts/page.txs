@@ -1,0 +1,88 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  getCreatorContracts,
+  acceptContract,
+  rejectContract,
+  Contract,
+} from "@/lib/contracts";
+
+export default function CreatorContracts() {
+  const [contracts, setContracts] = useState<Contract[]>([]);
+
+  useEffect(() => {
+    const data = getCreatorContracts("creator_demo");
+    setContracts(data);
+  }, []);
+
+  const refresh = () => {
+    setContracts(getCreatorContracts("creator_demo"));
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white p-6">
+
+      <h1 className="text-2xl font-bold text-orange-400">
+        Contract Inbox
+      </h1>
+
+      <div className="mt-6 space-y-4">
+
+        {contracts.length === 0 && (
+          <p className="text-gray-400">
+            No contracts yet
+          </p>
+        )}
+
+        {contracts.map((c) => (
+          <div
+            key={c.id}
+            className="bg-[#141414] p-4 rounded-xl"
+          >
+            <p className="font-bold">
+              {c.productName}
+            </p>
+
+            <p className="text-sm text-gray-400">
+              Seller: @{c.sellerId}
+            </p>
+
+            <p className="text-orange-400 mt-1">
+              Creator: {c.creatorShare}% + Zyvrra 2%
+            </p>
+
+            <p className="text-sm mt-2">
+              Status: {c.status}
+            </p>
+
+            <div className="flex gap-2 mt-3">
+
+              <button
+                onClick={() => {
+                  acceptContract(c.id);
+                  refresh();
+                }}
+                className="bg-green-500 text-black px-3 py-1 rounded"
+              >
+                Accept
+              </button>
+
+              <button
+                onClick={() => {
+                  rejectContract(c.id);
+                  refresh();
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Reject
+              </button>
+
+            </div>
+          </div>
+        ))}
+
+      </div>
+    </div>
+  );
+}
