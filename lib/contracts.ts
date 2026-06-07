@@ -1,121 +1,36 @@
-export type ContractStatus =
-  | "Pending"
-  | "Active"
-  | "Rejected"
-  | "Ended";
-
-export type Contract = {
+export type Order = {
   id: string;
-
-  sellerId: string;
-  creatorId: string;
-
+  buyerId: string;
   productName: string;
-
-  // 💰 SPLIT RULES
-  creatorShare: number; // e.g. 10%
-  sellerShare: number;  // auto-calculated
-  zyvrraFee: number;    // always 2%
-
-  status: ContractStatus;
-
+  amount: number;
   createdAt: number;
 };
 
-/**
- * In-memory contract storage (MVP)
- * Later replaced with database (Supabase/Firebase/Postgres)
- */
-let contracts: Contract[] = [];
+let orders: Order[] = [];
 
 /**
- * CREATE CONTRACT (Seller action)
- * This is what powers your marketplace agreements
+ * CREATE ORDER (checkout placeholder)
  */
-export function createContract(input: {
-  sellerId: string;
-  creatorId: string;
+export function createOrder(input: {
+  buyerId: string;
   productName: string;
-  creatorShare: number;
-}): Contract {
-  const zyvrraFee = 2;
-
-  const contract: Contract = {
-    id: `contract_${Date.now()}`,
-
-    sellerId: input.sellerId,
-    creatorId: input.creatorId,
-
+  amount: number;
+}): Order {
+  const order: Order = {
+    id: `order_${Date.now()}`,
+    buyerId: input.buyerId,
     productName: input.productName,
-
-    creatorShare: input.creatorShare,
-    sellerShare: 100 - input.creatorShare - zyvrraFee,
-    zyvrraFee,
-
-    status: "Pending",
-
+    amount: input.amount,
     createdAt: Date.now(),
   };
 
-  contracts.push(contract);
-
-  return contract;
+  orders.push(order);
+  return order;
 }
 
 /**
- * GET CONTRACTS FOR CREATOR (Inbox)
+ * GET ORDERS
  */
-export function getCreatorContracts(creatorId: string) {
-  return contracts.filter(
-    (c) => c.creatorId === creatorId
-  );
-}
-
-/**
- * GET CONTRACTS FOR SELLER (Dashboard)
- */
-export function getSellerContracts(sellerId: string) {
-  return contracts.filter(
-    (c) => c.sellerId === sellerId
-  );
-}
-
-/**
- * ACCEPT CONTRACT (Creator action)
- */
-export function acceptContract(contractId: string) {
-  contracts = contracts.map((c) =>
-    c.id === contractId
-      ? { ...c, status: "Active" }
-      : c
-  );
-}
-
-/**
- * REJECT CONTRACT (Creator action)
- */
-export function rejectContract(contractId: string) {
-  contracts = contracts.map((c) =>
-    c.id === contractId
-      ? { ...c, status: "Rejected" }
-      : c
-  );
-}
-
-/**
- * END CONTRACT (optional future use)
- */
-export function endContract(contractId: string) {
-  contracts = contracts.map((c) =>
-    c.id === contractId
-      ? { ...c, status: "Ended" }
-      : c
-  );
-}
-
-/**
- * GET SINGLE CONTRACT (useful for contract page later)
- */
-export function getContractById(contractId: string) {
-  return contracts.find((c) => c.id === contractId);
+export function getOrders() {
+  return orders;
 }
