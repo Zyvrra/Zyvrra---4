@@ -12,8 +12,12 @@ export default function UploadPage() {
   const [price, setPrice] = useState<number>(0);
   const [caption, setCaption] = useState("");
 
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+
   const handleUpload = () => {
-    if (!username || !productName || !price) return;
+    if (!username || !productName || !price || !videoFile) return;
+
+    const videoUrl = URL.createObjectURL(videoFile);
 
     addPost({
       id: `post_${Date.now()}`,
@@ -21,6 +25,7 @@ export default function UploadPage() {
       productName,
       price,
       caption,
+      videoUrl,
       createdAt: Date.now(),
     });
 
@@ -29,8 +34,9 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
+
       <h1 className="text-2xl font-bold text-orange-400">
-        Upload Product
+        Upload Product Video
       </h1>
 
       <div className="mt-6 flex flex-col gap-4">
@@ -60,12 +66,29 @@ export default function UploadPage() {
           onChange={(e) => setCaption(e.target.value)}
         />
 
+        {/* VIDEO UPLOAD */}
+        <input
+          type="file"
+          accept="video/*"
+          className="p-3 bg-[#141414] rounded"
+          onChange={(e) =>
+            setVideoFile(e.target.files?.[0] || null)
+          }
+        />
+
+        {videoFile && (
+          <p className="text-sm text-gray-400">
+            Selected: {videoFile.name}
+          </p>
+        )}
+
         <button
           onClick={handleUpload}
           className="bg-orange-500 text-black font-bold p-3 rounded"
         >
-          Post to Feed
+          Post Video
         </button>
+
       </div>
     </div>
   );
