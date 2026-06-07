@@ -16,9 +16,9 @@ export async function addOrder(order: Order) {
 export async function updateOrder(updated: Order) {
   const orders = (await kv.get<Order[]>(ORDERS_KEY)) || [];
 
-  const newOrders = orders.map((o) =>
+  const updatedList = orders.map((o) =>
     o.id === updated.id ? updated : o
   );
 
-  await kv.set(ORDERS_KEY, newOrders);
+  await kv.set(ORDERS_KEY, updatedList);
 }
