@@ -64,24 +64,7 @@ export default function FeedPage() {
             {/* ACTIONS */}
             <div className="flex justify-between mt-4 text-sm">
 
-              {/* REACTIONS */}
-              <div className="flex gap-3">
-                <button onClick={() => handleReaction(post.id, "yiyo")}>
-                  🔥 yiyo
-                </button>
-
-                <button onClick={() => handleReaction(post.id, "cmart")}>
-                  🤝 cmart
-                </button>
-
-                <button onClick={() => handleReaction(post.id, "sbwl")}>
-                  🥵 sbwl
-                </button>
-
-                <button onClick={() => handleReaction(post.id, "neyva")}>
-                  👎 Neyva
-                </button>
-              </div>
+            <ReactionBar postId={post.id} />
 
               {/* RIGHT ACTIONS */}
               <div className="flex gap-3">
