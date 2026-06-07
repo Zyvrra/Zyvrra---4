@@ -64,4 +64,86 @@ export default function SellerHub() {
         </div>
 
         <div className="bg-[#141414] p-4 rounded-xl">
-          <
+          <p className="text-gray-400 text-sm">
+            Delivered Orders
+          </p>
+
+          <h2 className="text-xl font-bold">
+            {deliveredOrders.length}
+          </h2>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">
+          Recent Orders
+        </h2>
+
+        <div className="space-y-3">
+          {orders.length === 0 && (
+            <div className="bg-[#141414] p-4 rounded-xl">
+              No orders yet.
+            </div>
+          )}
+
+          {orders.map((order) => (
+            <div
+              key={order.id}
+              className="bg-[#141414] p-4 rounded-xl flex justify-between"
+            >
+              <div>
+                <p className="font-bold">
+                  {order.productName}
+                </p>
+
+                <p className="text-gray-400 text-sm">
+                  Buyer: @{order.buyerId}
+                </p>
+
+                <p className="text-orange-400">
+                  R{order.amount}
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p
+                  className={
+                    order.status === "Delivered"
+                      ? "text-green-400"
+                      : order.status === "Dispatched"
+                      ? "text-yellow-400"
+                      : "text-gray-400"
+                  }
+                >
+                  {order.status}
+                </p>
+
+                {order.status === "Pending" && (
+                  <button
+                    onClick={() =>
+                      handleDispatch(order.id)
+                    }
+                    className="mt-2 bg-white text-black px-3 py-1 rounded text-xs"
+                  >
+                    Mark Dispatched
+                  </button>
+                )}
+
+                {order.status === "Dispatched" && (
+                  <button
+                    onClick={() =>
+                      handleDelivered(order.id)
+                    }
+                    className="mt-2 bg-green-500 text-black px-3 py-1 rounded text-xs"
+                  >
+                    Mark Delivered
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
