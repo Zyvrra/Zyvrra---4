@@ -4,7 +4,7 @@ export type Post = {
   productName: string;
   price: number;
   caption: string;
-  videoUrl?: string;
+  videoUrl: string; // IMPORTANT: real video file URL (MVP = local blob)
   createdAt: number;
 };
 
@@ -15,6 +15,7 @@ let posts: Post[] = [
     productName: "Urban Sneaker Drop",
     price: 1200,
     caption: "Fresh local heat 🔥",
+    videoUrl: "",
     createdAt: Date.now(),
   },
   {
@@ -23,6 +24,7 @@ let posts: Post[] = [
     productName: "African Street Hoodie",
     price: 850,
     caption: "Built for the culture 🖤",
+    videoUrl: "",
     createdAt: Date.now(),
   },
 ];
