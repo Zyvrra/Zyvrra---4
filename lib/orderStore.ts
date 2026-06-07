@@ -20,7 +20,7 @@ export type Order = {
 let orders: Order[] = [];
 
 /**
- * CREATE ORDER
+ * CREATE ORDER (NOW CONTRACT-AWARE)
  */
 export function createOrder(input: {
   buyerId: string;
@@ -52,10 +52,19 @@ export function createOrder(input: {
 }
 
 /**
- * GET ORDERS
+ * GET ALL ORDERS
  */
 export function getOrders() {
   return orders;
+}
+
+/**
+ * GET ORDERS BY USER (seller/creator future use)
+ */
+export function getOrdersByUser(userId: string) {
+  return orders.filter(
+    (o) => o.sellerId === userId || o.creatorId === userId
+  );
 }
 
 /**
