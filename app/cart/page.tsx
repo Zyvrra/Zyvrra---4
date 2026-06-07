@@ -27,7 +27,7 @@ export default function CartPage() {
       setLoading(true);
 
       if (cart.length === 0) {
-        alert("Cart is empty");
+        alert("Your cart is empty");
         return;
       }
 
@@ -49,14 +49,17 @@ export default function CartPage() {
         return;
       }
 
-      // 🧠 CREATE ORDER BEFORE REDIRECT
+      // 🧠 CREATE ORDER BEFORE PAYMENT REDIRECT
       createOrder({
         buyerId: "buyer_demo",
-        productName: "Cart Purchase",
+        productName:
+          cart.length === 1
+            ? cart[0].productName
+            : `${cart.length} items purchase`,
         amount: totalAmount,
       });
 
-      // clear cart AFTER order creation
+      // clear cart safely
       clearCart();
 
       // redirect to Paystack
@@ -82,6 +85,7 @@ export default function CartPage() {
         </p>
       ) : (
         <>
+          {/* ITEMS */}
           <div className="mt-6 space-y-4">
             {cart.map((item, i) => (
               <div
@@ -103,6 +107,7 @@ export default function CartPage() {
             ))}
           </div>
 
+          {/* SUMMARY */}
           <div className="mt-6 bg-[#141414] p-4 rounded-xl">
             <p>Subtotal: R{subtotal}</p>
             <p>Delivery: R{deliveryFee}</p>
@@ -111,6 +116,7 @@ export default function CartPage() {
             </p>
           </div>
 
+          {/* CHECKOUT */}
           <button
             onClick={handleCheckout}
             disabled={loading}
