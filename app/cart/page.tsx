@@ -28,13 +28,7 @@ export default function CartPage() {
     cart.reduce((sum, item) => sum + item.price, 0) + deliveryFee;
 
   const handleCheckout = async () => {
-    const role = getUserRole();
-
-    // 🚨 only buyers can checkout
-    if (!role || role !== "buyer") {
-      alert("Only buyers can checkout");
-      return;
-    }
+    const role = getUserRole() || "guest";
 
     if (cart.length === 0) {
       alert("Cart is empty");
@@ -42,7 +36,7 @@ export default function CartPage() {
     }
 
     const order = createOrder({
-      buyerId: role,
+      buyerId: role, // anyone can checkout now
       sellerId: cart[0].sellerId,
       productName: cart[0].productName,
       amount: cart[0].price,
@@ -50,7 +44,7 @@ export default function CartPage() {
     });
 
     const payment = await initializePaystackPayment({
-      email: "buyer@email.com",
+      email: "user@email.com",
       amount: total,
       reference: order.id
     });
@@ -85,7 +79,7 @@ export default function CartPage() {
         </p>
       </div>
 
-      {/* CHECKOUT BUTTON */}
+      {/* CHECKOUT */}
       <button
         onClick={handleCheckout}
         className="mt-6 w-full bg-orange-500 text-black p-3 rounded-xl font-bold"
