@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getOrders } from "@/lib/orderStore";
+import { getOrders, updateOrder } from "@/lib/orderStore";
 import {
   Order,
   markAsDispatched,
@@ -16,23 +16,29 @@ export default function SellerHub() {
   }, []);
 
   const handleDispatch = (orderId: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? markAsDispatched(order)
-          : order
-      )
-    );
+    const updatedOrders = orders.map((order) => {
+      if (order.id !== orderId) return order;
+
+      const updated = markAsDispatched(order);
+      updateOrder(updated);
+
+      return updated;
+    });
+
+    setOrders(updatedOrders);
   };
 
   const handleDelivered = (orderId: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? markAsDelivered(order)
-          : order
-      )
-    );
+    const updatedOrders = orders.map((order) => {
+      if (order.id !== orderId) return order;
+
+      const updated = markAsDelivered(order);
+      updateOrder(updated);
+
+      return updated;
+    });
+
+    setOrders(updatedOrders);
   };
 
   const totalSales = orders.reduce(
