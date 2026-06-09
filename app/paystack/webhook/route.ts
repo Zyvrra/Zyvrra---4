@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { createOrder } from "@/lib/orders";
-import { addOrder } from "@/lib/orderStore";
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +9,6 @@ export async function POST(req: Request) {
     const body = await req.text();
     const signature = req.headers.get("x-paystack-signature");
 
-    // 🔐 VERIFY PAYSTACK REQUEST
     const hash = crypto
       .createHmac("sha512", secret)
       .update(body)
@@ -25,26 +23,19 @@ export async function POST(req: Request) {
 
     const event = JSON.parse(body);
 
-    // ✔ ONLY PROCESS SUCCESSFUL PAYMENTS
     if (event.event === "charge.success") {
       const data = event.data;
-
       const metadata = data.metadata || {};
 
-      // 🧠 CREATE ORDER AFTER PAYMENT
-      const order = createOrder({
+      createOrder({
         buyerId: metadata.buyerId || "unknown",
         sellerId: metadata.sellerId || "unknown",
-
         creatorId: metadata.creatorId,
         affiliateLinkCode: metadata.affiliateLinkCode,
-
         productName: metadata.productName || "Product",
         amount: data.amount / 100,
         deliveryFee: metadata.deliveryFee || 75,
       });
-
-      await addOrder(order);
     }
 
     return NextResponse.json({ success: true });
