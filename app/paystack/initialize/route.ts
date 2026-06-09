@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import axios from "axios";
 
 export async function POST(req: Request) {
   try {
@@ -7,21 +6,24 @@ export async function POST(req: Request) {
 
     const { email, amount } = body;
 
-    const response = await axios.post(
+    const response = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {
-        email,
-        amount: amount * 100, // Paystack uses kobo
-      },
-      {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          email,
+          amount: amount * 100,
+        }),
       }
     );
 
-    return NextResponse.json(response.data);
+    const data = await response.json();
+
+    return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message },
