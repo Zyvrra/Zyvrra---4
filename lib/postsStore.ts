@@ -1,5 +1,3 @@
-import { kv } from "@vercel/kv";
-
 export type Post = {
   id: string;
   username: string;
@@ -10,20 +8,18 @@ export type Post = {
   createdAt: number;
 };
 
-const POSTS_KEY = "zyvrra_posts";
+let posts: Post[] = [];
 
 /**
- * Get all posts (safe for Vercel)
+ * Get all posts
  */
 export async function getPosts(): Promise<Post[]> {
-  const posts = await kv.get<Post[]>(POSTS_KEY);
-  return posts || [];
+  return posts;
 }
 
 /**
  * Add new post
  */
 export async function addPost(post: Post) {
-  const posts = (await kv.get<Post[]>(POSTS_KEY)) || [];
-  await kv.set(POSTS_KEY, [post, ...posts]);
+  posts = [post, ...posts];
 }
