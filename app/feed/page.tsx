@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ReactionBar from "@/components/ReactionBar";
 import { getPosts, Post } from "@/lib/postsStore";
 import { addToCart } from "@/lib/cartStore";
+import { getCurrentUser } from "@/lib/userStore";
+import Link from "next/link";
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const user = getCurrentUser();
 
   useEffect(() => {
     async function load() {
@@ -15,183 +18,217 @@ export default function FeedPage() {
       setPosts(data);
       setLoading(false);
     }
-
     load();
   }, []);
 
+  const handleAddToCart = (post: Post) => {
+    addToCart({
+      ...post,
+      creatorId: "creator_" + post.username,
+      affiliateLinkCode: "link_" + post.id,
+    });
+    alert("✅ Added to bag!");
+  };
+
+  const handleNext = () => {
+    if (currentIndex < posts.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="text-center">
+          <div className="animate-spin text-6xl mb-4">⚡</div>
+          <p className="text-white text-xl font-bold">Loading feed...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 text-center">
+        <p className="text-6xl mb-4">📭</p>
+        <p className="text-2xl font-bold mb-2">No Posts Yet</p>
+        <p className="text-gray-400 mb-6">Be the first to create content!</p>
+        <Link href="/upload" className="btn-neon">
+          📷 Upload Now
+        </Link>
+      </div>
+    );
+  }
+
+  const currentPost = posts[currentIndex];
+  const progress = ((currentIndex + 1) / posts.length) * 100;
+
   return (
-    <div className="bg-black min-h-screen text-white">
-
-      {/* HEADER */}
-      <div className="sticky top-16 z-40 bg-gradient-to-b from-black via-black/95 to-transparent border-b border-orange-500/20 px-4 py-3 flex justify-between items-center backdrop-blur-md">
-        <h1 className="text-3xl font-black gradient-text">
-          ⚡ Zyvrra
-        </h1>
-
-        <button
-          onClick={() => (window.location.href = "/upload")}
-          className="btn-neon text-xs px-3 py-2 flex items-center gap-2"
-        >
-          📷 Upload
-        </button>
+    <div className="fixed inset-0 bg-black overflow-hidden pt-20">
+      {/* PROGRESS BAR */}
+      <div className="absolute top-16 left-0 right-0 h-1 bg-white/10 z-40">
+        <div
+          className="h-full bg-gradient-to-r from-orange-400 to-pink-400 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
-      {/* LOADING STATE */}
-      {loading && (
-        <div className="h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block">
-              <div className="animate-spin">
-                <span className="text-6xl">⚡</span>
-              </div>
+      {/* MAIN FEED CONTAINER */}
+      <div className="relative h-full w-full flex items-center justify-center">
+        {/* VIDEO BACKGROUND */}
+        <div className="absolute inset-0 w-full h-full">
+          {currentPost.videoUrl ? (
+            <video
+              src={currentPost.videoUrl}
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+              <p className="text-gray-500 text-lg">🎥 Video unavailable</p>
             </div>
-            <p className="mt-4 text-gray-400 text-lg font-semibold">
-              Loading your feed...
-            </p>
-          </div>
+          )}
         </div>
-      )}
 
-      {/* FEED */}
-      <div>
-        {posts.map((post, index) => (
-          <div
-            key={post.id}
-            className="relative h-screen border-b border-orange-500/10 snap-start"
-            style={{ animation: `fade-in 0.6s ease-out ${index * 0.1}s both` }}
-          >
+        {/* OVERLAY - DARK GRADIENT */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
 
-            {/* VIDEO AREA */}
-            <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
-              {post.videoUrl ? (
-                <video
-                  src={post.videoUrl}
-                  className="w-full h-full object-cover"
-                  loop
-                  muted
-                  playsInline
-                />
-              ) : (
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🎥</div>
-                  <p className="text-gray-500 text-lg">No video uploaded</p>
-                </div>
-              )}
+        {/* CONTENT OVERLAY */}
+        <div className="relative z-20 w-full h-full flex flex-col justify-between p-4 pb-24">
+          {/* TOP - USER INFO */}
+          <div className="flex items-center gap-3 mt-4 animate-fade-in">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+              {currentPost.displayName?.charAt(0).toUpperCase() || "Z"}
             </div>
-
-            {/* ENHANCED DARK OVERLAY */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-            
-            {/* CORNER ACCENT GLOW */}
-            <div className="absolute top-4 right-4 w-24 h-24 bg-orange-500/10 rounded-full blur-3xl" />
-
-            {/* LEFT INFO - ENHANCED */}
-            <div className="absolute bottom-32 left-4 max-w-[70%] z-20">
-              {/* USERNAME */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-orange-400 font-bold text-lg">✓</span>
-                <p className="font-bold text-xl text-white">
-                  @{post.username}
-                </p>
-              </div>
-
-              {/* CAPTION */}
-              <p className="mt-3 text-sm text-gray-300 line-clamp-2 leading-relaxed">
-                {post.caption}
+            <div>
+              <p className="font-bold text-white text-lg leading-tight">
+                {currentPost.displayName || currentPost.username}
               </p>
+              <p className="text-sm text-gray-300">{currentPost.category}</p>
+            </div>
+          </div>
 
-              {/* PRODUCT NAME */}
-              <h2 className="mt-4 text-2xl font-black text-white leading-tight">
-                {post.productName}
+          {/* BOTTOM - PRODUCT INFO & ACTIONS */}
+          <div className="space-y-4 animate-fade-in">
+            {/* PRODUCT DETAILS */}
+            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+              <h2 className="text-white font-black text-2xl mb-2 leading-tight">
+                {currentPost.productName}
               </h2>
-
-              {/* PRICE - NEON */}
-              <p className="mt-2 text-2xl font-black bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                R{post.price}
+              <p className="text-gray-300 text-sm mb-3 line-clamp-2">
+                {currentPost.caption}
               </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-xs">Price</p>
+                  <p className="text-orange-400 font-black text-2xl">
+                    R{currentPost.price}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-gray-400 text-xs">Views</p>
+                  <p className="text-white font-bold">
+                    {(currentPost.views || 0).toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* RIGHT ACTIONS - ENHANCED */}
-            <div className="absolute right-4 bottom-32 flex flex-col gap-3 items-center z-20">
-
-              {/* REACTION BUTTONS */}
-              <div className="flex flex-col gap-2">
-                <button className="group relative px-4 py-2 rounded-full bg-white/10 hover:bg-orange-500/20 border border-white/10 hover:border-orange-400/50 transition-all duration-300 text-sm font-semibold hover:scale-110 active:scale-95">
-                  ❤️ Love
-                  <span className="absolute -top-8 right-0 bg-black/80 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    Like
-                  </span>
-                </button>
-
-                <button className="group relative px-4 py-2 rounded-full bg-white/10 hover:bg-orange-500/20 border border-white/10 hover:border-orange-400/50 transition-all duration-300 text-sm font-semibold hover:scale-110 active:scale-95">
-                  💾 Save
-                  <span className="absolute -top-8 right-0 bg-black/80 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    Bookmark
-                  </span>
-                </button>
-
-                <button className="group relative px-4 py-2 rounded-full bg-white/10 hover:bg-orange-500/20 border border-white/10 hover:border-orange-400/50 transition-all duration-300 text-sm font-semibold hover:scale-110 active:scale-95">
-                  🔗 Share
-                  <span className="absolute -top-8 right-0 bg-black/80 px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    Share
-                  </span>
-                </button>
-              </div>
-
-              {/* PRIMARY BAG BUTTON - ELECTRIFYING */}
+            {/* ACTION BUTTONS */}
+            <div className="flex gap-2">
+              {/* ADD TO BAG - PRIMARY */}
               <button
-                onClick={() =>
-                  addToCart({
-                    id: post.id,
-                    username: post.username,
-                    productName: post.productName,
-                    price: post.price,
-                    caption: post.caption,
-                    videoUrl: post.videoUrl,
-                    createdAt: post.createdAt,
-                    creatorId: "creator_demo",
-                    affiliateLinkCode: "link_demo",
-                  })
-                }
-                className="relative group mt-2"
+                onClick={() => handleAddToCart(currentPost)}
+                className="flex-1 btn-neon py-3 font-bold text-lg flex items-center justify-center gap-2"
               >
-                {/* GLOW EFFECT */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300 group-active:opacity-50" />
-                
-                {/* BUTTON */}
-                <div className="relative btn-neon px-5 py-3 text-sm font-bold flex items-center gap-2 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
-                  🛍 Add to Bag
-                </div>
+                🛍️ Add to Bag
               </button>
 
+              {/* SHARE */}
+              <button className="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold text-white transition">
+                🔗
+              </button>
+
+              {/* SAVE */}
+              <button className="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold text-white transition">
+                💾
+              </button>
             </div>
-
-            {/* REACTIONS - BOTTOM */}
-            <div className="absolute bottom-4 left-4 right-4 z-20">
-              <ReactionBar postId={post.id} />
-            </div>
-
-          </div>
-        ))}
-      </div>
-
-      {/* EMPTY STATE */}
-      {!loading && posts.length === 0 && (
-        <div className="h-screen flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-6xl mb-4">📭</p>
-            <p className="text-gray-400 text-lg font-semibold">
-              No posts yet. Be the first creator!
-            </p>
-            <button
-              onClick={() => (window.location.href = "/upload")}
-              className="mt-6 btn-neon"
-            >
-              Start Creating
-            </button>
           </div>
         </div>
-      )}
+
+        {/* RIGHT SIDE - ENGAGEMENT STATS */}
+        <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-4">
+          {/* LIKE */}
+          <div className="flex flex-col items-center gap-1 group cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-white/10 hover:bg-red-500/20 group-hover:scale-110 flex items-center justify-center text-2xl transition-all">
+              ❤️
+            </div>
+            <p className="text-xs text-white font-bold">
+              {(currentPost.likes || 0).toLocaleString()}
+            </p>
+          </div>
+
+          {/* COMMENT */}
+          <div className="flex flex-col items-center gap-1 group cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-white/10 hover:bg-blue-500/20 group-hover:scale-110 flex items-center justify-center text-2xl transition-all">
+              💬
+            </div>
+            <p className="text-xs text-white font-bold">42</p>
+          </div>
+
+          {/* SAVE */}
+          <div className="flex flex-col items-center gap-1 group cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-white/10 hover:bg-yellow-500/20 group-hover:scale-110 flex items-center justify-center text-2xl transition-all">
+              💾
+            </div>
+            <p className="text-xs text-white font-bold">
+              {(currentPost.saves || 0).toLocaleString()}
+            </p>
+          </div>
+
+          {/* CREATOR */}
+          <div className="flex flex-col items-center gap-1 group cursor-pointer">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-pink-400 group-hover:scale-110 flex items-center justify-center text-2xl transition-all">
+              👤
+            </div>
+            <p className="text-xs text-white font-bold">Follow</p>
+          </div>
+        </div>
+
+        {/* NAVIGATION ARROWS */}
+        {currentIndex > 0 && (
+          <button
+            onClick={handlePrev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-2xl transition"
+          >
+            ←
+          </button>
+        )}
+
+        {currentIndex < posts.length - 1 && (
+          <button
+            onClick={handleNext}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-2xl transition"
+          >
+            →
+          </button>
+        )}
+
+        {/* POST COUNTER */}
+        <div className="absolute top-20 right-4 z-30 bg-black/60 backdrop-blur px-3 py-1 rounded-full text-white text-sm font-bold">
+          {currentIndex + 1} / {posts.length}
+        </div>
+      </div>
     </div>
   );
 }
