@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
-import { ShoppingBag, Grid, User, Home, Search } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Zyvrra",
-  description: "Social Commerce for Fashion",
+  description: "Social Commerce Platform",
 };
 
 export default function RootLayout({
@@ -24,9 +23,8 @@ export default function RootLayout({
                 Zyvrra
               </h1>
 
-              <button className="flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full text-sm">
-                <Search size={16} />
-                Search
+              <button className="bg-zinc-100 px-4 py-2 rounded-full text-sm">
+                🔍 Search
               </button>
             </div>
 
@@ -49,11 +47,12 @@ export default function RootLayout({
 
         {/* Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 flex justify-around items-center h-16 z-50">
+
           <Link
             href="/"
             className="flex flex-col items-center gap-1 text-xs"
           >
-            <Home size={22} />
+            <span className="text-xl">🏠</span>
             <span>Feed</span>
           </Link>
 
@@ -61,7 +60,7 @@ export default function RootLayout({
             href="/category"
             className="flex flex-col items-center gap-1 text-xs"
           >
-            <Grid size={22} />
+            <span className="text-xl">🧭</span>
             <span>Explore</span>
           </Link>
 
@@ -78,7 +77,7 @@ export default function RootLayout({
             href="/cart"
             className="flex flex-col items-center gap-1 text-xs"
           >
-            <ShoppingBag size={22} />
+            <span className="text-xl">🛒</span>
             <span>Cart</span>
           </Link>
 
@@ -86,9 +85,10 @@ export default function RootLayout({
             href="/me"
             className="flex flex-col items-center gap-1 text-xs"
           >
-            <User size={22} />
+            <span className="text-xl">👤</span>
             <span>Me</span>
           </Link>
+
         </nav>
       </body>
     </html>
